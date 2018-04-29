@@ -27,8 +27,8 @@
                 <action android:name="android.intent.action.ACTION_TIME_CHANGED" />
             </intent-filter>
         </receiver>
-        <service android:name=".AlarmService" />
-        <service android:name=".SoundService" />
+        <service android:name=".AlarmService" android:process=":remote1"/>
+        <service android:name=".SoundService" android:process=":remote2"/>
     </application>
 
 </manifest>

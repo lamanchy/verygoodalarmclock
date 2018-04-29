@@ -5,5 +5,5 @@
     <string name="one_time_change">One time change</string>
     <string name="one_time_off">One time off</string>
     <string name="used_mp3">used.mp3</string>
-    <string name="to_be_used">to_be_used.mp3</string>
+    <string name="to_be_used_mp3">to_be_used.mp3</string>
 </resources>
