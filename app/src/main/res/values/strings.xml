@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">VeryGoodAlarmClock</string>
+    <string name="app_name">Very good alarm clock</string>
+    <string name="time_picker_title">Select time</string>
+    <string name="regular_alarm">Regular alarm</string>
+    <string name="one_time_change">One time change</string>
+    <string name="one_time_off">One time off</string>
+    <string name="used_mp3">used.mp3</string>
+    <string name="to_be_used">to_be_used.mp3</string>
 </resources>

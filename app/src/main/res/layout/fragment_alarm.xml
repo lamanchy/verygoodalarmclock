@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:text="00:00"
+        android:textSize="20sp"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="6"
+        android:shadowColor="#000"
+        android:id="@+id/one_time_alarm_time"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="00:00"
+        android:textSize="100sp"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="6"
+        android:shadowColor="#000"
+        android:id="@+id/regular_alarm_time"
+        />
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <ToggleButton
+            android:id="@+id/regular_alarm_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:checked="true"
+            android:textOff="@string/regular_alarm"
+            android:textOn="@string/regular_alarm" />
+        <ToggleButton
+            android:id="@+id/one_time_change_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:checked="true"
+            android:textOff="@string/one_time_change"
+            android:textOn="@string/one_time_change" />
+        <ToggleButton
+            android:id="@+id/one_time_off_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textOff="@string/one_time_off"
+            android:textOn="@string/one_time_off" />
+    </LinearLayout>
+</LinearLayout>
+
+<!-- TODO change "selected" color -->
+<!-- TODO change time sizes-->
