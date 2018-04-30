@@ -10,5 +10,6 @@ public interface Enums {
     String EVENIN_PREFIX = "evenin'";
 
     String RESET_ACTION = "reset_action";
+    String STOP_ACTION = "stop_action";
 }
 

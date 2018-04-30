@@ -60,10 +60,10 @@ public class AlarmService extends IntentService {
                 resetAlarms();
                 break;
             case Enums.MORNIN_PREFIX:
-                instantiateProcessForNewDayActivities();
+                runAlarm(morninPreferences);
                 break;
             case Enums.EVENIN_PREFIX:
-                showEveningNotification();
+                runAlarm(eveninPreferences);
                 break;
         }
     }
@@ -74,18 +74,35 @@ public class AlarmService extends IntentService {
         downloadSong();
     }
 
-    // someone told me, that naming is hard?
-    private void instantiateProcessForNewDayActivities() {
-        Log.i("service","morning good to go");
-        Intent intent = new Intent(this, SoundService.class);
-        startService(intent);
+    private void runAlarm(CustomPreferences preferences) {
+        if (morninPreferences.getEnabled(Enums.ONE_TIME_OFF)) {
+            morninPreferences.setEnabled(Enums.ONE_TIME_OFF, false);
+        } else {
+            if (morninPreferences.getEnabled(Enums.ONE_TIME_ALARM)) {
+                morninPreferences.setEnabled(Enums.ONE_TIME_ALARM, false);
+            }
+
+            // if next regular time would be sooner then 3 hours, skip it
+            Long nextAlarmTime = getNextAlarmTime(preferences);
+            if (nextAlarmTime != null && nextAlarmTime < System.currentTimeMillis() + 3*60*60*1000) {
+                morninPreferences.setEnabled(Enums.ONE_TIME_OFF, true);
+            }
+
+
+            Intent intent = new Intent(this, SoundService.class);
+            startService(intent);
+        }
+
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ignored) {
+        } finally {
+            resetAlarms();
+        }
     }
 
-    private void showEveningNotification() {
 
-    }
-
-    @SuppressLint("DefaultLocale")
     private void setAlarmFor(CustomPreferences preferences) {
         Intent intent = new Intent(this, AlarmService.class);
         intent.setAction(preferences.getPrefix());
@@ -95,10 +112,28 @@ public class AlarmService extends IntentService {
             pendingIntent.cancel();
         }
 
+        Log.i("alarmtime", "setting alarm " + preferences.getPrefix());
+        Long absoluteAlarmTimeMillis = getNextAlarmTime(preferences);
+
         // alarms are off, do noting
+        if (absoluteAlarmTimeMillis == null) {
+            return;
+        }
+
+        pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, absoluteAlarmTimeMillis, pendingIntent);
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, absoluteAlarmTimeMillis, pendingIntent);
+        }
+
+    }
+
+    @Nullable
+    private Long getNextAlarmTime(CustomPreferences preferences) {
         if (!preferences.getEnabled(Enums.REGULAR_ALARM)
                 && !preferences.getEnabled(Enums.ONE_TIME_ALARM)) {
-            return;
+            return null;
         }
 
         String alarmToInvoke = preferences.getEnabled(Enums.ONE_TIME_ALARM)
@@ -122,14 +157,15 @@ public class AlarmService extends IntentService {
         // cancels alarm, and then schedule next day alarm
         // (executed alarm blocks this thread for at least 1000ms
         // so it wont reexecute it)
-        if (alarmDayMillis < currentDayMillis - 1000) {
+        if (alarmDayMillis < currentDayMillis + 1000) {
             alarmDayMillis += oneDayMillis;
         }
 
         // if one off is turned on => only regular can be turned on => next one is day after
-        if (preferences.getEnabled(Enums.ONE_TIME_OFF)) {
-            alarmDayMillis += oneDayMillis;
-        }
+//        if (preferences.getEnabled(Enums.ONE_TIME_OFF)) {
+//            alarmDayMillis += oneDayMillis;
+//        }
+//      ALARM IS SET, BUT IT DOESN'T SOUND
 
         Long absoluteAlarmTimeMillis = thisDayMillis + alarmDayMillis
                 - new GregorianCalendar().getTimeZone().getRawOffset()
@@ -141,14 +177,8 @@ public class AlarmService extends IntentService {
         int hours = (int) ((timeToAlarmMillis / (1000 * 60 * 60)) % 24);
         int days = (int) ((timeToAlarmMillis / (1000 * 60 * 60 * 24)));
         Log.i("alarmtime", String.format("Alarm in %d days, %d hours, %d minutes and %d seconds", days, hours, minutes, seconds));
-//        Toast.makeText(this, String.format("Alarm in %d hours, %d minutes and %d seconds", hours, minutes, seconds), Toast.LENGTH_SHORT).show();
 
-        pendingIntent = PendingIntent.getService(this, 0, intent, 0);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, absoluteAlarmTimeMillis, pendingIntent);
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, absoluteAlarmTimeMillis, pendingIntent);
-        }
+        return absoluteAlarmTimeMillis;
     }
 
     private void downloadSong() {

@@ -7,9 +7,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.File;
@@ -32,9 +35,19 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        putIntoForeground();
-        if (!mediaPlayer.isPlaying()) {
-            runSong();
+        Log.i("soundservice", "got intent");
+        Log.i("soundservice", String.valueOf(intent == null));
+        Log.i("soundservice", String.valueOf(intent.getAction() == null));
+        Log.i("soundservice", String.valueOf(intent.getAction()));
+        if (intent == null ||
+                intent.getAction() == null ||
+                !intent.getAction().equals(Enums.STOP_ACTION)) {
+            putIntoForeground();
+            if (!mediaPlayer.isPlaying()) {
+                runSong();
+            }
+        } else {
+            stopSelf();
         }
         return START_STICKY;
     }
@@ -66,15 +79,16 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
     }
 
     private void putIntoForeground() {
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, SoundService.class);
+        intent.setAction(Enums.STOP_ACTION);
         PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, 0, notificationIntent, 0);
+                PendingIntent.getService(this, 0, intent, 0);
 
         Notification notification =
                 new Notification.Builder(this)
                         .setContentTitle("title")
                         .setContentText("text")
-//                        .setSmallIcon(R.drawable.icon)
+                        .setSmallIcon(R.drawable.alarm_icon)
                         .setContentIntent(pendingIntent)
                         .setTicker("ticker")
                         .build();
@@ -91,7 +105,7 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
             mediaPlayer.setDataSource(usedSong.getPath());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
             mediaPlayer.prepare();
-        } catch (IOException e) {
+        } catch (IOException e) { // backup song
             int resID=getResources().getIdentifier("all_my_tears.mp3", "raw", getPackageName());
             mediaPlayer = MediaPlayer.create(this,resID);
         }
