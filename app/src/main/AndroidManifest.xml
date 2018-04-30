@@ -3,6 +3,7 @@
     package="com.lamanchy.verygoodalarmclock">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,7 +15,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:excludeFromRecents="true"
+            >
+            <!--android:process=":custom"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,8 +32,17 @@
                 <action android:name="android.intent.action.ACTION_TIME_CHANGED" />
             </intent-filter>
         </receiver>
-        <service android:name=".AlarmService" android:process=":remote1"/>
-        <service android:name=".SoundService" android:process=":remote2"/>
+        <service
+            android:name=".AlarmService"
+            android:exported="false"
+            android:stopWithTask="false"
+            />
+        <service
+            android:name=".SoundService"
+            android:process=":remote"
+            android:exported="false"
+            android:stopWithTask="false"
+            />
     </application>
 
 </manifest>

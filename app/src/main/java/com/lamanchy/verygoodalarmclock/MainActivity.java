@@ -1,5 +1,6 @@
 package com.lamanchy.verygoodalarmclock;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.app.FragmentManager;
@@ -48,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         updateService();
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
@@ -65,5 +65,14 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         preferences.unregisterOnSharedPreferenceChangeListener(listener);
+
+        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        if (activityManager != null) {
+            activityManager.moveTaskToFront(getTaskId(), 0);
+        }
+
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_HOME);
+        startActivity(i);
     }
 }
