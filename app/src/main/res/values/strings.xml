@@ -1,9 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Very good alarm clock</string>
     <string name="time_picker_title">Select time</string>
     <string name="regular_alarm">Regular alarm</string>
     <string name="one_time_change">One time change</string>
     <string name="one_time_off">One time off</string>
-    <string name="used_mp3">used.mp3</string>
-    <string name="to_be_used_mp3">to_be_used.mp3</string>
+    <string name="mornin_message">Good mornin\' fella!</string>
+    <string name="evenin_message">You should go to sleep…</string>
+    <string name="default_song_path" translatable="false">all_my_tears.mp3</string>
+    <string name="default_song_name" translatable="false">Ane Brun - All my tears</string>
 </resources>

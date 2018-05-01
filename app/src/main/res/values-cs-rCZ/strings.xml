@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Móc dobrý budík</string>
+    <string name="time_picker_title">Vyber čas</string>
+    <string name="regular_alarm">Pravidelný budík</string>
+    <string name="one_time_change">Jeednorázová změna</string>
+    <string name="one_time_off">Jednou přeskoč</string>
+    <string name="mornin_message">Dobré ráno!</string>
+    <string name="evenin_message">Měl bys jít spát…</string>
+</resources>

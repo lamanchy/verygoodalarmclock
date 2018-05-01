@@ -1,27 +1,22 @@
 package com.lamanchy.verygoodalarmclock;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class SoundService extends Service implements MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
     MediaPlayer mediaPlayer;
-    private File usedSong;
-    private File toBeUsedSong; // toBeUsedOrNotToBeUsed?
+    SongManager songManager;
 
     @Override
     public void onCreate() {
@@ -29,27 +24,22 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
         mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
         mediaPlayer.setOnErrorListener(this);
         mediaPlayer.setOnCompletionListener(this);
-        usedSong = new File(getFilesDir(), getString(R.string.used_mp3));
-        toBeUsedSong = new File(getFilesDir(), getString(R.string.to_be_used_mp3)); // toBeUsedOrNotToBeUsed?
+        songManager = new SongManager(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i("soundservice", "got intent");
-        Log.i("soundservice", String.valueOf(intent == null));
-        Log.i("soundservice", String.valueOf(intent.getAction() == null));
-        Log.i("soundservice", String.valueOf(intent.getAction()));
-        if (intent == null ||
-                intent.getAction() == null ||
-                !intent.getAction().equals(Enums.STOP_ACTION)) {
-            putIntoForeground();
+        if (intent == null || intent.getAction() == null) {
+            Log.i("SoundService", "Empty intent (or none)");
+        } else if (!intent.getAction().equals(Enums.STOP_ACTION)) {
+            putIntoForeground(intent);
             if (!mediaPlayer.isPlaying()) {
                 runSong();
             }
         } else {
             stopSelf();
         }
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -78,7 +68,7 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
         stopSelf();
     }
 
-    private void putIntoForeground() {
+    private void putIntoForeground(Intent originalIntent) {
         Intent intent = new Intent(this, SoundService.class);
         intent.setAction(Enums.STOP_ACTION);
         PendingIntent pendingIntent =
@@ -86,29 +76,33 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
 
         Notification notification =
                 new Notification.Builder(this)
-                        .setContentTitle("title")
-                        .setContentText("text")
+                        .setContentTitle(getNotificationTitle(originalIntent))
+                        .setContentText(songManager.getSongName())
                         .setSmallIcon(R.drawable.alarm_icon)
                         .setContentIntent(pendingIntent)
-                        .setTicker("ticker")
                         .build();
 
         startForeground(1, notification);
     }
 
     private void runSong() {
-        if (toBeUsedSong.exists()) {
-            usedSong.delete();
-            toBeUsedSong.renameTo(usedSong);
-        }
+        songManager.switchSongs();
         try {
-            mediaPlayer.setDataSource(usedSong.getPath());
+            mediaPlayer.setDataSource(songManager.getSongPath());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
             mediaPlayer.prepare();
         } catch (IOException e) { // backup song
+            e.printStackTrace();
+            Log.i("what", getString(R.string.default_song_path));
             int resID=getResources().getIdentifier("all_my_tears.mp3", "raw", getPackageName());
             mediaPlayer = MediaPlayer.create(this,resID);
         }
         mediaPlayer.start();
+    }
+
+    public String getNotificationTitle(Intent originalIntent) {
+        return Objects.equals(originalIntent.getAction(), Enums.MORNIN_PREFIX)
+                ? getString(R.string.mornin_message)
+                : getString(R.string.evenin_message);
     }
 }

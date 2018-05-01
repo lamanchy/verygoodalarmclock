@@ -10,10 +10,13 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.GregorianCalendar;
@@ -22,10 +25,7 @@ public class AlarmService extends IntentService {
     private CustomPreferences morninPreferences;
     private CustomPreferences eveninPreferences;
     private AlarmManager alarmManager;
-
-    private Long songDurationMillis = 2 * 60 * 1000L; // default song is 2 minutes long
-    private File usedSong;
-    private File toBeUsedSong; // toBeUsedOrNotToBeUsed?
+    private SongManager songManager;
 
     public AlarmService() {
         super("Alarm");
@@ -39,9 +39,7 @@ public class AlarmService extends IntentService {
         morninPreferences = new CustomPreferences(this, Enums.MORNIN_PREFIX);
         eveninPreferences = new CustomPreferences(this, Enums.EVENIN_PREFIX);
 
-        usedSong = new File(getFilesDir(), getString(R.string.used_mp3));
-        toBeUsedSong = new File(getFilesDir(), getString(R.string.to_be_used_mp3)); // toBeUsedOrNotToBeUsed?
-        getSongDuration();
+        songManager = new SongManager(this);
     }
 
     @Override
@@ -75,21 +73,22 @@ public class AlarmService extends IntentService {
     }
 
     private void runAlarm(CustomPreferences preferences) {
-        if (morninPreferences.getEnabled(Enums.ONE_TIME_OFF)) {
-            morninPreferences.setEnabled(Enums.ONE_TIME_OFF, false);
+        if (preferences.getEnabled(Enums.ONE_TIME_OFF)) {
+            preferences.setEnabled(Enums.ONE_TIME_OFF, false);
         } else {
-            if (morninPreferences.getEnabled(Enums.ONE_TIME_ALARM)) {
-                morninPreferences.setEnabled(Enums.ONE_TIME_ALARM, false);
+            if (preferences.getEnabled(Enums.ONE_TIME_ALARM)) {
+                preferences.setEnabled(Enums.ONE_TIME_ALARM, false);
             }
 
             // if next regular time would be sooner then 3 hours, skip it
             Long nextAlarmTime = getNextAlarmTime(preferences);
             if (nextAlarmTime != null && nextAlarmTime < System.currentTimeMillis() + 3*60*60*1000) {
-                morninPreferences.setEnabled(Enums.ONE_TIME_OFF, true);
+                preferences.setEnabled(Enums.ONE_TIME_OFF, true);
             }
 
 
             Intent intent = new Intent(this, SoundService.class);
+            intent.setAction(preferences.getPrefix());
             startService(intent);
         }
 
@@ -150,7 +149,7 @@ public class AlarmService extends IntentService {
 
         // if morning, subtract song length
         if (preferences.getPrefix().equals(Enums.MORNIN_PREFIX)) {
-            alarmDayMillis -= songDurationMillis;
+            alarmDayMillis -= songManager.getSongDuration();
         }
 
         // to be sure, that RESET doesn't start a bit before alarm,
@@ -190,69 +189,11 @@ public class AlarmService extends IntentService {
             pendingIntent.cancel();
         }
 
-        if (toBeUsedSong.exists()) return; // song is downloaded
+        if (songManager.isDownloaded()) return; // song is downloaded
 
-        // download it
-        InputStream input = null;
-        FileOutputStream output = null;
-        File file = new File(getFilesDir(), "tmp.mp3");
-        Boolean allOk = true;
-        try {
-            // TODO serve songs randomly on some url
-            URL url = new URL("http://mocdobrahudba.lomic.cz/media/uploads/videos/Ane%20Brun%20-%20All%20My%20Tears.mp3");
-            URLConnection urlConnection = url.openConnection();
-
-            input = urlConnection.getInputStream();
-            output = new FileOutputStream(file);
-            byte[] buffer = new byte[1024]; // Adjust if you want
-            int bytesRead;
-            while ((bytesRead = input.read(buffer)) != -1) {
-                output.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException e) {
-            allOk = false;
-            e.printStackTrace();
-        } finally {
-            try {
-                if (input != null)
-                    input.close();
-                if (output != null)
-                    output.close();
-            } catch (IOException e) {
-                allOk = false;
-                e.printStackTrace();
-            }
-        }
-        if (allOk) {
-            // atomic operation to be sure fie is ok
-            file.renameTo(toBeUsedSong);
-        }
-
-        // something went wrong and file does not exists
-        if (!toBeUsedSong.exists()) {
-            // setup reset in future
-            pendingIntent = PendingIntent.getService(this, 0, intent, 0); // 3 hours
-            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3 * 60 * 60 * 1000, pendingIntent);
-            // "set" is used, no need to be exact
-        } else {
-            // recompute song duration, since it is computed only on create
-            getSongDuration();
-        }
-    }
-
-    private void getSongDuration() {
-        File song = toBeUsedSong.exists() ? toBeUsedSong : (
-                usedSong.exists() ? usedSong : null
-        );
-        if (song == null) return; // keep default value
-
-        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-        metaRetriever.setDataSource(song.getPath());
-        String duration = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        try {
-            songDurationMillis = Long.parseLong(duration);
-        } catch (NumberFormatException ignore) {
-            // keep the default value if error
-        }
+        // setup reset in future
+        pendingIntent = PendingIntent.getService(this, 0, intent, 0); // 3 hours
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3 * 60 * 60 * 1000, pendingIntent);
+        // "set" is used, no need to be exact
     }
 }

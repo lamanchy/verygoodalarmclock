@@ -43,9 +43,11 @@ public class MainActivity extends AppCompatActivity {
         };
 
         // testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
-        new CustomPreferences(this, Enums.MORNIN_PREFIX).setTime(Enums.ONE_TIME_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 3 + 2 * 60);
-        new CustomPreferences(this, Enums.MORNIN_PREFIX).setTime(Enums.REGULAR_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 4 + 2 * 60);
-        new CustomPreferences(this, Enums.MORNIN_PREFIX).setEnabled(Enums.ONE_TIME_ALARM, true);
+//        new CustomPreferences(this, Enums.MORNIN_PREFIX).setTime(Enums.ONE_TIME_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 3 + 2 * 60);
+//        new CustomPreferences(this, Enums.MORNIN_PREFIX).setTime(Enums.REGULAR_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 4 + 2 * 60);
+//        new CustomPreferences(this, Enums.MORNIN_PREFIX).setEnabled(Enums.ONE_TIME_ALARM, true);
+
+        new CustomPreferences(this, Enums.EVENIN_PREFIX).setTime(Enums.REGULAR_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 1 + 2 * 60);
         // testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
 
         updateService();
