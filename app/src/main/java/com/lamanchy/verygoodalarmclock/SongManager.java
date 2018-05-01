@@ -21,11 +21,11 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class SongManager {
-    public class Song {
+    private class Song {
         File name;
         File song;
 
-        Song(Context context, String type) {
+        private Song(Context context, String type) {
             song = new File(context.getFilesDir(), type + ".mp3");
             name = new File(context.getFilesDir(), type + ".name");
         }
@@ -35,7 +35,7 @@ public class SongManager {
         }
 
         @NonNull
-        Long getDuration() {
+        private Long getDuration() {
             MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
             metaRetriever.setDataSource(song.getPath());
             String duration = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
@@ -47,7 +47,7 @@ public class SongManager {
         }
 
         @NonNull
-        public String getName() {
+        private String getName() {
             String result = getNameFromFile(name);
             if (result == null) {
                 Log.e("SongManager", "Shit fuck can't read from local file?");
@@ -57,18 +57,18 @@ public class SongManager {
         }
 
         @NonNull
-        public String getPath() {
+        private String getPath() {
             return song.getPath();
         }
 
-        public void switchTo(Song other) {
+        private void switchTo(Song other) {
             other.set(song, getName());
             clean();
         }
 
-        public Boolean set(File file, @NonNull String newName) {
-            if (!name.delete()) return false;
-            if (!song.delete()) return false;
+        private Boolean set(File file, @NonNull String newName) {
+            if (name.exists() && !name.delete()) return false;
+            if (song.exists() && !song.delete()) return false;
             if (!writeNameToFile(name, newName)) {
                 clean();
                 return false;
@@ -77,14 +77,15 @@ public class SongManager {
                 clean();
                 return false;
             }
+            Log.i("SongManager", "Setting of song " + newName + " successful");
             return true;
         }
 
         private void clean() {
-            boolean nameDeleted = name.delete();
-            boolean songDeleted = song.delete();
-
-            if (!nameDeleted || !songDeleted) {
+            if (name.exists() && !name.delete()) {
+                Log.e("SongManager", "Fuck this shit if delete in clean does not work");
+            }
+            if (song.exists() && !song.delete()) {
                 Log.e("SongManager", "Fuck this shit if delete in clean does not work");
             }
         }
@@ -102,7 +103,7 @@ public class SongManager {
     }
 
     @Nullable
-    public Song getSong() {
+    private Song getSong() {
         return toBeUsedSong.exists() ? toBeUsedSong : (
                 usedSong.exists() ? usedSong : null
         );
@@ -133,7 +134,10 @@ public class SongManager {
     }
 
     public Boolean isDownloaded() {
-        if (toBeUsedSong.exists()) return true;
+        if (toBeUsedSong.exists()) {
+            Log.i("SongManager", "Song already downloaded");
+            return true;
+        }
 
         // download it
         InputStream input = null;
@@ -168,7 +172,10 @@ public class SongManager {
                 e.printStackTrace();
             }
         }
-        if (!allOk || name == null) return false;
+        if (!allOk || name == null) {
+            Log.w("SongManager", "Downloading error");
+            return false;
+        }
 
         return toBeUsedSong.set(file, name);
     }
