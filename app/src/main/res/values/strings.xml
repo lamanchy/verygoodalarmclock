@@ -7,6 +7,5 @@
     <string name="one_time_off">One time off</string>
     <string name="mornin_message">Good mornin\' fella!</string>
     <string name="evenin_message">You should go to sleep…</string>
-    <string name="default_song_path" translatable="false">all_my_tears.mp3</string>
     <string name="default_song_name" translatable="false">Ane Brun - All my tears</string>
 </resources>
