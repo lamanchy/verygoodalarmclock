@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="00:00"
-        android:textSize="100sp"
+        android:textSize="80sp"
         android:shadowDx="2"
         android:shadowDy="2"
         android:shadowRadius="6"
@@ -36,6 +36,8 @@
         android:gravity="center">
 
         <ToggleButton
+            android:layout_weight="1"
+            android:textSize="12sp"
             android:id="@+id/regular_alarm_toggle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -43,6 +45,8 @@
             android:textOff="@string/regular_alarm"
             android:textOn="@string/regular_alarm" />
         <ToggleButton
+            android:layout_weight="1"
+            android:textSize="12sp"
             android:id="@+id/one_time_change_toggle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -50,6 +54,8 @@
             android:textOff="@string/one_time_change"
             android:textOn="@string/one_time_change" />
         <ToggleButton
+            android:layout_weight="1"
+            android:textSize="12sp"
             android:id="@+id/one_time_off_toggle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

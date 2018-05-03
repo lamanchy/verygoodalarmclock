@@ -17,9 +17,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (fuckDoesFuckManufacturerFuckFuckFuckWithFuckFuckingFuckSwipeFuckQuestionFuckMarkFuck()
+                && (getIntent().getFlags() & Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS) == 0) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(getIntent().getFlags());
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+
+            finish();
+            startActivity(intent);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         if (savedInstanceState == null) {       // Important, otherwise there'd be a new Fragment created with every orientation change
             FragmentManager fragmentManager = getSupportFragmentManager();
             if (fragmentManager != null) {
@@ -49,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
 //        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-        // :)
         if (dpWidth < 600 || fuckDoesFuckManufacturerFuckFuckFuckWithFuckFuckingFuckSwipeFuckQuestionFuckMarkFuck()) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
@@ -96,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean fuckDoesFuckManufacturerFuckFuckFuckWithFuckFuckingFuckSwipeFuckQuestionFuckMarkFuck() {
+//        return true;
         return (Build.MANUFACTURER.equals("LENOVO")); // LENOVO, for now
     }
 

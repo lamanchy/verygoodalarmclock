@@ -15,10 +15,7 @@
         android:roundIcon="@drawable/alarm_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
-        <activity
-            android:name=".MainActivity"
-            android:excludeFromRecents="true">
-            <!--android:process=":custom"-->
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
