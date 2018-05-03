@@ -4,20 +4,18 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 public class CustomPreferences {
     private SharedPreferences sharedPreferences;
-
-    public String getPrefix() {
-        return prefix;
-    }
-
     private String prefix;
 
     CustomPreferences(Context context, String prefix) {
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         this.prefix = prefix;
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 
     public void registerOnSharedPreferenceChangeListener(
@@ -32,8 +30,10 @@ public class CustomPreferences {
 
     private Integer getDefaultTimeValue() {
         switch (prefix) {
-            case Enums.MORNIN_PREFIX: return 7*60;
-            case Enums.EVENIN_PREFIX: return 23*60;
+            case Enums.MORNIN_PREFIX:
+                return 7 * 60;
+            case Enums.EVENIN_PREFIX:
+                return 23 * 60;
         }
         return 0;
     }

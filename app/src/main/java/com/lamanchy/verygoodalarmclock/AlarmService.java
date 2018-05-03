@@ -1,25 +1,17 @@
 package com.lamanchy.verygoodalarmclock;
 
-import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 public class AlarmService extends IntentService {
     private CustomPreferences morninPreferences;
@@ -38,7 +30,6 @@ public class AlarmService extends IntentService {
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         morninPreferences = new CustomPreferences(this, Enums.MORNIN_PREFIX);
         eveninPreferences = new CustomPreferences(this, Enums.EVENIN_PREFIX);
-
         songManager = new SongManager(this);
     }
 
@@ -82,7 +73,7 @@ public class AlarmService extends IntentService {
 
             // if next regular time would be sooner then 3 hours, skip it
             Long nextAlarmTime = getNextAlarmTime(preferences);
-            if (nextAlarmTime != null && nextAlarmTime < System.currentTimeMillis() + 3*60*60*1000) {
+            if (nextAlarmTime != null && nextAlarmTime < System.currentTimeMillis() + 3 * 60 * 60 * 1000) {
                 preferences.setEnabled(Enums.ONE_TIME_OFF, true);
             }
 

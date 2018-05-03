@@ -1,11 +1,13 @@
 package com.lamanchy.verygoodalarmclock;
 
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 
@@ -42,12 +44,22 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+//        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+        // :)
+        if (dpWidth < 600 || fuckDoesFuckManufacturerFuckFuckFuckWithFuckFuckingFuckSwipeFuckQuestionFuckMarkFuck()) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
         // testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
 //        new CustomPreferences(this, Enums.MORNIN_PREFIX).setTime(Enums.ONE_TIME_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 3 + 2 * 60);
 //        new CustomPreferences(this, Enums.MORNIN_PREFIX).setTime(Enums.REGULAR_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 4 + 2 * 60);
 //        new CustomPreferences(this, Enums.MORNIN_PREFIX).setEnabled(Enums.ONE_TIME_ALARM, true);
 
-        new CustomPreferences(this, Enums.EVENIN_PREFIX).setTime(Enums.REGULAR_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 1 + 2 * 60);
+//        new CustomPreferences(this, Enums.EVENIN_PREFIX).setTime(Enums.REGULAR_ALARM, (int) ((System.currentTimeMillis() / 1000 / 60) % (24 * 60)) + 1 + 2 * 60);
         // testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
 
         updateService();
@@ -69,14 +81,23 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         preferences.unregisterOnSharedPreferenceChangeListener(listener);
-
-        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        if (activityManager != null) {
-            activityManager.moveTaskToFront(getTaskId(), 0);
-        }
-
-        Intent i = new Intent(Intent.ACTION_MAIN);
-        i.addCategory(Intent.CATEGORY_HOME);
-        startActivity(i);
     }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (fuckDoesFuckManufacturerFuckFuckFuckWithFuckFuckingFuckSwipeFuckQuestionFuckMarkFuck()) {
+            Intent i = new Intent(Intent.ACTION_MAIN);
+            i.addCategory(Intent.CATEGORY_HOME);
+            startActivity(i);
+        }
+    }
+
+    private boolean fuckDoesFuckManufacturerFuckFuckFuckWithFuckFuckingFuckSwipeFuckQuestionFuckMarkFuck() {
+        return (Build.MANUFACTURER.equals("LENOVO")); // LENOVO, for now
+    }
+
+
 }

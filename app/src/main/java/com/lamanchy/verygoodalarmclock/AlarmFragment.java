@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +24,6 @@ import butterknife.Unbinder;
 public class AlarmFragment extends Fragment {
     CustomPreferences preferences;
     SharedPreferences.OnSharedPreferenceChangeListener listener;
-    LocalBroadcastManager localBroadcastManager;
 
     private Unbinder unbinder;
     @BindView(R.id.regular_alarm_time) TextView regularAlarmTime;
@@ -72,8 +71,14 @@ public class AlarmFragment extends Fragment {
     }
 
     public void setContents() {
+        Log.i("AlarmFragment", "Setting contents");
         regularAlarmTime.setText(preferences.getTimeAsString(Enums.REGULAR_ALARM));
         regularAlarmToggle.setChecked(preferences.getEnabled(Enums.REGULAR_ALARM));
+
+//        Log.i("AlarmFragment", String.valueOf(((View)regularAlarmTime.getParent()).getWidth()));
+//        Log.i("AlarmFragment", String.valueOf(regularAlarmTime.getWidth()));
+//        Log.i("AlarmFragment", String.valueOf(regularAlarmTime.getLeft()));
+//        Log.i("AlarmFragment", String.valueOf(regularAlarmTime.getPaddingLeft()));
 
         oneTimeAlarmTime.setText(preferences.getTimeAsString(Enums.ONE_TIME_ALARM));
         oneTimeChangeToggle.setChecked(preferences.getEnabled(Enums.ONE_TIME_ALARM));
@@ -98,7 +103,7 @@ public class AlarmFragment extends Fragment {
         TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                preferences.setTime(type, hour * 60 + minute );
+                preferences.setTime(type, hour * 60 + minute);
                 if (!preferences.getEnabled(type)) {
                     preferences.flipEnabled(type);
                 }

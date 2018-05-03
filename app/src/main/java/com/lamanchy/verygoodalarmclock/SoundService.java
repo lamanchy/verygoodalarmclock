@@ -17,6 +17,7 @@ import java.util.Objects;
 public class SoundService extends Service implements MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
     MediaPlayer mediaPlayer;
     SongManager songManager;
+    String action;
 
     @Override
     public void onCreate() {
@@ -32,7 +33,8 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
         if (intent == null || intent.getAction() == null) {
             Log.i("SoundService", "Empty intent (or none)");
         } else if (!intent.getAction().equals(Enums.STOP_ACTION)) {
-            putIntoForeground(intent);
+            action = intent.getAction();
+            putIntoForeground();
             if (!mediaPlayer.isPlaying()) {
                 runSong();
             }
@@ -68,7 +70,7 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
         stopSelf();
     }
 
-    private void putIntoForeground(Intent originalIntent) {
+    private void putIntoForeground() {
         Intent intent = new Intent(this, SoundService.class);
         intent.setAction(Enums.STOP_ACTION);
         PendingIntent pendingIntent =
@@ -76,7 +78,7 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
 
         Notification notification =
                 new Notification.Builder(this)
-                        .setContentTitle(getNotificationTitle(originalIntent))
+                        .setContentTitle(getNotificationTitle())
                         .setContentText(songManager.getSongName())
                         .setSmallIcon(R.drawable.alarm_icon)
                         .setContentIntent(pendingIntent)
@@ -92,16 +94,14 @@ public class SoundService extends Service implements MediaPlayer.OnErrorListener
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
             mediaPlayer.prepare();
         } catch (IOException e) { // backup song
-            e.printStackTrace();
-            Log.i("what", getString(R.string.default_song_path));
-            int resID=getResources().getIdentifier("all_my_tears.mp3", "raw", getPackageName());
-            mediaPlayer = MediaPlayer.create(this,resID);
+            mediaPlayer.release();
+            mediaPlayer = MediaPlayer.create(this, R.raw.all_my_tears);
         }
         mediaPlayer.start();
     }
 
-    public String getNotificationTitle(Intent originalIntent) {
-        return Objects.equals(originalIntent.getAction(), Enums.MORNIN_PREFIX)
+    public String getNotificationTitle() {
+        return Objects.equals(action, Enums.MORNIN_PREFIX)
                 ? getString(R.string.mornin_message)
                 : getString(R.string.evenin_message);
     }

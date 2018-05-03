@@ -1,9 +1,7 @@
 package com.lamanchy.verygoodalarmclock;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,81 +19,10 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class SongManager {
-    private class Song {
-        File name;
-        File song;
-
-        private Song(Context context, String type) {
-            song = new File(context.getFilesDir(), type + ".mp3");
-            name = new File(context.getFilesDir(), type + ".name");
-        }
-
-        Boolean exists() {
-            return song.exists() && name.exists();
-        }
-
-        @NonNull
-        private Long getDuration() {
-            MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-            metaRetriever.setDataSource(song.getPath());
-            String duration = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            try {
-                return Long.parseLong(duration);
-            } catch (NumberFormatException ignore) {
-                return defaultDurationMillis;
-            }
-        }
-
-        @NonNull
-        private String getName() {
-            String result = getNameFromFile(name);
-            if (result == null) {
-                Log.e("SongManager", "Shit fuck can't read from local file?");
-                return "Name error";
-            }
-            return result;
-        }
-
-        @NonNull
-        private String getPath() {
-            return song.getPath();
-        }
-
-        private void switchTo(Song other) {
-            other.set(song, getName());
-            clean();
-        }
-
-        private Boolean set(File file, @NonNull String newName) {
-            if (name.exists() && !name.delete()) return false;
-            if (song.exists() && !song.delete()) return false;
-            if (!writeNameToFile(name, newName)) {
-                clean();
-                return false;
-            }
-            if (!file.renameTo(song)) {
-                clean();
-                return false;
-            }
-            Log.i("SongManager", "Setting of song " + newName + " successful");
-            return true;
-        }
-
-        private void clean() {
-            if (name.exists() && !name.delete()) {
-                Log.e("SongManager", "Fuck this shit if delete in clean does not work");
-            }
-            if (song.exists() && !song.delete()) {
-                Log.e("SongManager", "Fuck this shit if delete in clean does not work");
-            }
-        }
-    }
-
     private Context context;
     private Song usedSong;
     private Song toBeUsedSong; // toBeUsedOrNotToBeUsed?
     private Long defaultDurationMillis = 2 * 60 * 1000L; // default song is 2 minutes long
-
     public SongManager(Context context) {
         this.context = context;
         usedSong = new Song(context, "used_song");
@@ -128,7 +55,7 @@ public class SongManager {
     }
 
     public void switchSongs() {
-        if (toBeUsedSong.exists()){
+        if (toBeUsedSong.exists()) {
             toBeUsedSong.switchTo(usedSong);
         }
     }
@@ -148,8 +75,10 @@ public class SongManager {
         try {
             URL url = new URL("http://mocdobrahudba.lomic.cz/random_song/");
             URLConnection urlConnection = url.openConnection();
-            name = urlConnection.getHeaderField("Content-Disposition")
-                    .substring("attachment; filename=".length());
+            name = urlConnection.getHeaderField("Content-Disposition");
+            if (name != null) {
+                name = name.substring("attachment; filename=".length());
+            }
 
             input = urlConnection.getInputStream();
             output = new FileOutputStream(file);
@@ -204,5 +133,76 @@ public class SongManager {
             return false;
         }
         return true;
+    }
+
+    private class Song {
+        File name;
+        File song;
+
+        private Song(Context context, String type) {
+            song = new File(context.getFilesDir(), type + ".mp3");
+            name = new File(context.getFilesDir(), type + ".name");
+        }
+
+        Boolean exists() {
+            return song.exists() && name.exists();
+        }
+
+        @NonNull
+        private Long getDuration() {
+            MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+            metaRetriever.setDataSource(song.getPath());
+            String duration = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            try {
+                return Long.parseLong(duration);
+            } catch (NumberFormatException ignore) {
+                return defaultDurationMillis;
+            }
+        }
+
+        @NonNull
+        private String getName() {
+            String result = getNameFromFile(name);
+            if (result == null) {
+                Log.e("SongManager", "Shit fuck can't read from local file?");
+                return "Name error";
+            }
+            return result;
+        }
+
+        @NonNull
+        private String getPath() {
+            return song.getPath();
+        }
+
+        private void switchTo(Song other) {
+            other.set(song, getName());
+            clean();
+        }
+
+        @NonNull
+        private Boolean set(File file, @NonNull String newName) {
+            if (name.exists() && !name.delete()) return false;
+            if (song.exists() && !song.delete()) return false;
+            if (!writeNameToFile(name, newName)) {
+                clean();
+                return false;
+            }
+            if (!file.renameTo(song)) {
+                clean();
+                return false;
+            }
+            Log.i("SongManager", "Setting of song " + newName + " successful");
+            return true;
+        }
+
+        private void clean() {
+            if (name.exists() && !name.delete()) {
+                Log.e("SongManager", "Fuck this shit if delete in clean does not work");
+            }
+            if (song.exists() && !song.delete()) {
+                Log.e("SongManager", "Fuck this shit if delete in clean does not work");
+            }
+        }
     }
 }
