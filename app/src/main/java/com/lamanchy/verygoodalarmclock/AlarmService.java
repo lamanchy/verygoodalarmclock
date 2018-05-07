@@ -1,17 +1,14 @@
 package com.lamanchy.verygoodalarmclock;
 
-import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.GregorianCalendar;
-import java.util.List;
 
 public class AlarmService extends IntentService {
     private CustomPreferences morninPreferences;
@@ -35,14 +32,9 @@ public class AlarmService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        if (intent == null) {
-            Log.i("service", "No intent? How that can be?"); // serious question
-            return;
-        } else if (intent.getAction() == null) {
-            Log.i("service", "Intent with no action.");
+        if (intent == null || intent.getAction() == null) {
             return;
         }
-        Log.i("alarmtime", "intent come");
 
         switch (intent.getAction()) {
             case Enums.RESET_ACTION:
@@ -151,12 +143,6 @@ public class AlarmService extends IntentService {
             alarmDayMillis += oneDayMillis;
         }
 
-        // if one off is turned on => only regular can be turned on => next one is day after
-//        if (preferences.getEnabled(Enums.ONE_TIME_OFF)) {
-//            alarmDayMillis += oneDayMillis;
-//        }
-//      ALARM IS SET, BUT IT DOESN'T SOUND
-
         Long absoluteAlarmTimeMillis = thisDayMillis + alarmDayMillis
                 - new GregorianCalendar().getTimeZone().getRawOffset()
                 - 1000L * 60 * 60; // one hour millis to get to UTC;
@@ -166,7 +152,7 @@ public class AlarmService extends IntentService {
         int minutes = (int) ((timeToAlarmMillis / (1000 * 60)) % 60);
         int hours = (int) ((timeToAlarmMillis / (1000 * 60 * 60)) % 24);
         int days = (int) ((timeToAlarmMillis / (1000 * 60 * 60 * 24)));
-        Log.i("alarmtime", String.format("Alarm in %d days, %d hours, %d minutes and %d seconds", days, hours, minutes, seconds));
+        Log.i("AlarmService", String.format("Alarm in %d days, %d hours, %d minutes and %d seconds", days, hours, minutes, seconds));
 
         return absoluteAlarmTimeMillis;
     }

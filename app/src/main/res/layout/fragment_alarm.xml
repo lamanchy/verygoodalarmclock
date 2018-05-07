@@ -1,68 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/base"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:gravity="center">
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="end"
-        android:text="00:00"
-        android:textSize="20sp"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="6"
-        android:shadowColor="#000"
-        android:id="@+id/one_time_alarm_time"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="00:00"
-        android:textSize="80sp"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="6"
-        android:shadowColor="#000"
-        android:id="@+id/regular_alarm_time"
-        />
-    <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:orientation="vertical">
 
-        <ToggleButton
-            android:layout_weight="1"
-            android:textSize="12sp"
-            android:id="@+id/regular_alarm_toggle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:checked="true"
-            android:textOff="@string/regular_alarm"
-            android:textOn="@string/regular_alarm" />
-        <ToggleButton
-            android:layout_weight="1"
-            android:textSize="12sp"
-            android:id="@+id/one_time_change_toggle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:checked="true"
-            android:textOff="@string/one_time_change"
-            android:textOn="@string/one_time_change" />
-        <ToggleButton
-            android:layout_weight="1"
-            android:textSize="12sp"
-            android:id="@+id/one_time_off_toggle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textOff="@string/one_time_off"
-            android:textOn="@string/one_time_off" />
+        <TextView
+            android:id="@+id/one_time_alarm_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:shadowColor="#000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="6"
+            android:text="00:00"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/regular_alarm_part"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/regular_alarm_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:shadowColor="#000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="6"
+                android:text="@string/regular_alarm"
+                android:textSize="0sp" />
+
+            <TextView
+                android:id="@+id/regular_alarm_middle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:shadowColor="#000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="6"
+                android:text=": "
+                android:textSize="0sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/regular_alarm_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:shadowColor="#000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="6"
+                android:text="00:00"
+                android:textSize="80sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ToggleButton
+                android:id="@+id/regular_alarm_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:checked="true"
+                android:textOff="@string/regular_alarm"
+                android:textOn="@string/regular_alarm" />
+
+            <ToggleButton
+                android:id="@+id/one_time_change_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:checked="true"
+                android:textOff="@string/one_time_change"
+                android:textOn="@string/one_time_change" />
+
+            <ToggleButton
+                android:id="@+id/one_time_off_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textOff="@string/one_time_off"
+                android:textOn="@string/one_time_off" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
-
-<!-- TODO change "selected" color -->
-<!-- TODO change time sizes-->
