@@ -20,10 +20,10 @@ import java.net.URLConnection;
 import java.util.GregorianCalendar;
 
 public class SongManager {
-    private Context context;
+    private Context context;        // Na operace, ktere provadis, ti staci aplikacni Context. Nedrz si silnou referenci na Context, kdyz nemusis, je to nebezpecne kvuli leakum.
     private Song usedSong;
     private Song toBeUsedSong; // toBeUsedOrNotToBeUsed?
-    private Long defaultDurationMillis = 2 * 60 * 1000L; // default song is 2 minutes long
+    private Long defaultDurationMillis = 2 * 60 * 1000L; // default song is 2 minutes long - Proc je to promenna a ne konstanta?
 
     public SongManager(Context context) {
         this.context = context;

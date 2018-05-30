@@ -5,6 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+/**
+ * Mozna by bylo fajn vytvorit si par metod jako getInt() a setString() a pak je pouzivat misto sharedPreferences.edit().putInt().apply(), zprehledni to kod.
+ *
+ * Zamyslel bych se nad poradim metod. Public nahoru, private dolu. Kdyz prijdu do tridy, zajimaji me public metody a nechci pro ne scrollovat na konec tridy.
+ */
 public class CustomPreferences {
     private SharedPreferences sharedPreferences;
     private String prefix;
@@ -46,6 +51,8 @@ public class CustomPreferences {
         return prefix + "enabled" + type;
     }
 
+    // Potrebujes vracet Integer? U setteru staci void, pokud neni duvod vracet neco jineho. V tomto pripade je Integer zbytecny a rika ti to i Lint.
+    // Jak uz jsem rikal na cviku, kdyz muzes, nikdy nepouzivej objektovou reprezentaci primitivnich typu, pokud nemusis. Zabira to fakt moc mista v pameti.
     public Integer setTime(String type, Integer time) {
         sharedPreferences.edit().putInt(getTimeId(type), time).apply();
         return time;
@@ -57,7 +64,7 @@ public class CustomPreferences {
 
     @SuppressLint("DefaultLocale")
     public String getTimeAsString(String type) {
-        Integer time = getTime(type);
+        Integer time = getTime(type);       // SimpleDateFormat, ne tohle
         return String.format("%02d", time / 60) + ':' + String.format("%02d", time % 60);
     }
 

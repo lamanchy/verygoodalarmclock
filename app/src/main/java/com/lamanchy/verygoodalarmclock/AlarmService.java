@@ -61,9 +61,9 @@ public class AlarmService extends IntentService {
                 preferences.setEnabled(Enums.ONE_TIME_ALARM, false);
             }
 
-            // if next regular time would be sooner then 3 hours, skip it
+            // if next regular time would be sooner then 3 hours, skip it - dobry napad
             Long nextAlarmTime = songManager.getNextAlarmTime(preferences, false);
-            if (nextAlarmTime != null && nextAlarmTime < System.currentTimeMillis() + 3 * 60 * 60 * 1000) {
+            if (nextAlarmTime != null && nextAlarmTime < System.currentTimeMillis() + 3 * 60 * 60 * 1000) {     // Konstanta s popisujicim nazvem misto toho prikladu
                 preferences.setEnabled(Enums.ONE_TIME_OFF, true);
             }
 
@@ -122,7 +122,7 @@ public class AlarmService extends IntentService {
 
         // setup reset in future
         pendingIntent = PendingIntent.getService(this, 0, intent, 0); // 3 hours
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3 * 60 * 60 * 1000, pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3 * 60 * 60 * 1000, pendingIntent);      // Znovu konstanta
         // "set" is used, no need to be exact
     }
 

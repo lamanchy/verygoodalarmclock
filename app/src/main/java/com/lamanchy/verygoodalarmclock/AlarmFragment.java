@@ -243,7 +243,7 @@ public class AlarmFragment extends Fragment {
         } catch (IllegalStateException e) {
             Toast.makeText(
                     getContext(),
-                    "No alarm to turn off (even once)",
+                    "No alarm to turn off (even once)",     // R.string....
                     Toast.LENGTH_LONG).show();
             setContents(true);
         }
