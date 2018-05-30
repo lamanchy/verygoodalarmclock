@@ -7,4 +7,18 @@
     <string name="one_time_off">Jednou přeskoč</string>
     <string name="mornin_message">Dobré ráno!</string>
     <string name="evenin_message">Měl bys jít spát…</string>
+    <string name="mornin_title">Budík na ráno:</string>
+    <string name="evenin_title">Budík na večer:</string>
+    <string name="mornin_toast_no_alarm">ranní budík vypnut</string>
+    <string name="evenin_toast_no_alarm">večerní budík vypnut</string>
+    <string name="mornin_toast_alarm_in">čas do raního budíku:</string>
+    <string name="evenin_toast_alarm_in">čas do večerního budíku:</string>
+    <string name="day">jeden den</string>
+    <string name="hours1">hodina</string>
+    <string name="hours234">hodiny</string>
+    <string name="hoursmore">hodin</string>
+    <string name="minutes1">minuta</string>
+    <string name="minutes234">minuty</string>
+    <string name="minutesmore">minut</string>
+    <string name="and">a</string>
 </resources>

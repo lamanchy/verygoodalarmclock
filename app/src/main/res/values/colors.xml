@@ -6,4 +6,6 @@
     <color name="colorDisabledText">#80FFFFFF</color>
     <color name="colorIcons">#80FFFFFF</color>
     <color name="colorDividers">#1FFFFFFF</color>
+    <color name="colorSwitch">#3CF73C</color>
+    <color name="colorHighlight">#B33CF73C</color>
 </resources>

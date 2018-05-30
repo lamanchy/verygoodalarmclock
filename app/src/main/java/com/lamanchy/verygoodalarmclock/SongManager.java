@@ -17,12 +17,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.GregorianCalendar;
 
 public class SongManager {
     private Context context;
     private Song usedSong;
     private Song toBeUsedSong; // toBeUsedOrNotToBeUsed?
     private Long defaultDurationMillis = 2 * 60 * 1000L; // default song is 2 minutes long
+
     public SongManager(Context context) {
         this.context = context;
         usedSong = new Song(context, "used_song");
@@ -133,6 +135,56 @@ public class SongManager {
             return false;
         }
         return true;
+    }
+
+    @Nullable
+    public Long getNextAlarmTime(CustomPreferences preferences, boolean nextTrueAlarm) {
+        if (!preferences.getEnabled(Enums.REGULAR_ALARM)
+                && !preferences.getEnabled(Enums.ONE_TIME_ALARM)) {
+            return null;
+        }
+
+        String alarmToInvoke = preferences.getEnabled(Enums.ONE_TIME_ALARM)
+                ? Enums.ONE_TIME_ALARM
+                : Enums.REGULAR_ALARM;
+
+        Long currentTime = System.currentTimeMillis()
+                + new GregorianCalendar().getTimeZone().getRawOffset()
+                + 1000L * 60 * 60; // one hour millis to get to UTC
+        Long oneDayMillis = 1000L * 60 * 60 * 24;
+        Long thisDayMillis = (currentTime / oneDayMillis) * oneDayMillis;
+        Long currentDayMillis = currentTime % oneDayMillis;
+        Long alarmDayMillis = preferences.getTime(alarmToInvoke) * 60 * 1000L;
+
+        // if morning, subtract song length
+        if (preferences.getPrefix().equals(Enums.MORNIN_PREFIX)) {
+            alarmDayMillis -= getSongDuration();
+        }
+
+        // to be sure, that RESET doesn't start a bit before alarm,
+        // cancels alarm, and then schedule next day alarm
+        // (executed alarm blocks this thread for at least 1000ms
+        // so it wont reexecute it)
+        if (alarmDayMillis < currentDayMillis + 1000) {
+            alarmDayMillis += oneDayMillis;
+        }
+
+        if (nextTrueAlarm && preferences.getEnabled(Enums.ONE_TIME_OFF)) {
+            alarmDayMillis += oneDayMillis;
+        }
+
+        Long absoluteAlarmTimeMillis = thisDayMillis + alarmDayMillis
+                - new GregorianCalendar().getTimeZone().getRawOffset()
+                - 1000L * 60 * 60; // one hour millis to get to UTC;
+
+        Long timeToAlarmMillis = absoluteAlarmTimeMillis - System.currentTimeMillis();
+        int seconds = (int) (timeToAlarmMillis / 1000) % 60;
+        int minutes = (int) ((timeToAlarmMillis / (1000 * 60)) % 60);
+        int hours = (int) ((timeToAlarmMillis / (1000 * 60 * 60)) % 24);
+        int days = (int) ((timeToAlarmMillis / (1000 * 60 * 60 * 24)));
+        Log.i("SongManager", String.format("Alarm in %d days, %d hours, %d minutes and %d seconds", days, hours, minutes, seconds));
+
+        return absoluteAlarmTimeMillis;
     }
 
     private class Song {

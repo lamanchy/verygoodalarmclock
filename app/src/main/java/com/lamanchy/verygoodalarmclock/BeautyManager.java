@@ -17,12 +17,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class BeautyManager {
+    public Boolean useRightPadding;
     private AlarmFragment alarmFragment;
     private CustomPreferences preferences;
 
     public BeautyManager(AlarmFragment alarmFragment, CustomPreferences preferences) {
         this.alarmFragment = alarmFragment;
         this.preferences = preferences;
+
+        useRightPadding = false;
     }
 
     public static float getWidth(Context context) {
@@ -40,6 +43,7 @@ public class BeautyManager {
         animations.add(sizeAnimator(alarmFragment.regularAlarmHint));
         animations.add(sizeAnimator(alarmFragment.regularAlarmMiddle));
         animations.add(sizeAnimator(alarmFragment.oneTimeAlarmTime));
+        animations.add(sizeAnimator(alarmFragment.filler));
 
         animations.add(centerAnimator(alarmFragment.regularAlarmPart));
         animations.add(centerAnimator(alarmFragment.oneTimeAlarmTime));
@@ -94,9 +98,15 @@ public class BeautyManager {
 
     public float getTextSize(TextView text) {
         if (text == alarmFragment.oneTimeAlarmTime) {
-            return preferences.getEnabled(Enums.ONE_TIME_ALARM) ? getBigTextSize() : getSmallTextSize();
+            return preferences.getEnabled(Enums.ONE_TIME_ALARM) ? getBigTextSize() : 0;
+        } else if (text == alarmFragment.filler) {
+            return preferences.getEnabled(Enums.ONE_TIME_ALARM) ? (
+                    preferences.getEnabled(Enums.REGULAR_ALARM) ? 0 : getSmallTextSize()
+            ) : getSmallTextSize();
         } else if (text == alarmFragment.regularAlarmTime) {
-            return preferences.getEnabled(Enums.ONE_TIME_ALARM) ? getSmallTextSize() : getBigTextSize();
+            return preferences.getEnabled(Enums.ONE_TIME_ALARM) ? (
+                    preferences.getEnabled(Enums.REGULAR_ALARM) ? getSmallTextSize() : 0
+            ) : getBigTextSize();
         } else {
             return (preferences.getEnabled(Enums.ONE_TIME_ALARM)
                     && preferences.getEnabled(Enums.REGULAR_ALARM)) ? getSmallTextSize() : 0;
@@ -195,8 +205,13 @@ public class BeautyManager {
         }
 
         public float getCenteredRightPadding() {
-            return (getParentWidth() - view.getWidth()) / 2;
+            float res = (getParentWidth() - getTrueWidth()) / 2;
+            res = res == 0 ? 1 : res;
+            return res;
+        }
 
+        public Integer getTrueWidth() {
+            return useRightPadding ? view.getWidth() - view.getPaddingRight() : view.getWidth();
         }
 
         public Integer getParentWidth() {

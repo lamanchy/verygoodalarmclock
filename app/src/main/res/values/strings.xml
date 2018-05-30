@@ -8,4 +8,18 @@
     <string name="mornin_message">Good mornin\' fella!</string>
     <string name="evenin_message">You should go to sleep…</string>
     <string name="default_song_name" translatable="false">Ane Brun - All my tears</string>
+    <string name="mornin_title">Mornin\' alarm:</string>
+    <string name="evenin_title">Evenin\' alarm:</string>
+    <string name="mornin_toast_no_alarm">mornin\' alarm unset</string>
+    <string name="evenin_toast_no_alarm">evenin\' alarm unset</string>
+    <string name="mornin_toast_alarm_in">time to mornin\' alarm:</string>
+    <string name="evenin_toast_alarm_in">time to evenin\' alarm:</string>
+    <string name="day">one day</string>
+    <string name="hours1">hour</string>
+    <string name="hours234">hours</string>
+    <string name="hoursmore">hours</string>
+    <string name="minutes1">minute</string>
+    <string name="minutes234">minutes</string>
+    <string name="minutesmore">minutes</string>
+    <string name="and">and</string>
 </resources>

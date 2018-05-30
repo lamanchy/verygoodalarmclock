@@ -8,8 +8,6 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.util.GregorianCalendar;
-
 public class AlarmService extends IntentService {
     private CustomPreferences morninPreferences;
     private CustomPreferences eveninPreferences;
@@ -64,7 +62,7 @@ public class AlarmService extends IntentService {
             }
 
             // if next regular time would be sooner then 3 hours, skip it
-            Long nextAlarmTime = getNextAlarmTime(preferences);
+            Long nextAlarmTime = songManager.getNextAlarmTime(preferences, false);
             if (nextAlarmTime != null && nextAlarmTime < System.currentTimeMillis() + 3 * 60 * 60 * 1000) {
                 preferences.setEnabled(Enums.ONE_TIME_OFF, true);
             }
@@ -95,7 +93,7 @@ public class AlarmService extends IntentService {
         }
 
         Log.i("alarmtime", "setting alarm " + preferences.getPrefix());
-        Long absoluteAlarmTimeMillis = getNextAlarmTime(preferences);
+        Long absoluteAlarmTimeMillis = songManager.getNextAlarmTime(preferences, false);
 
         // alarms are off, do noting
         if (absoluteAlarmTimeMillis == null) {
@@ -109,52 +107,6 @@ public class AlarmService extends IntentService {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, absoluteAlarmTimeMillis, pendingIntent);
         }
 
-    }
-
-    @Nullable
-    private Long getNextAlarmTime(CustomPreferences preferences) {
-        if (!preferences.getEnabled(Enums.REGULAR_ALARM)
-                && !preferences.getEnabled(Enums.ONE_TIME_ALARM)) {
-            return null;
-        }
-
-        String alarmToInvoke = preferences.getEnabled(Enums.ONE_TIME_ALARM)
-                ? Enums.ONE_TIME_ALARM
-                : Enums.REGULAR_ALARM;
-
-        Long currentTime = System.currentTimeMillis()
-                + new GregorianCalendar().getTimeZone().getRawOffset()
-                + 1000L * 60 * 60; // one hour millis to get to UTC
-        Long oneDayMillis = 1000L * 60 * 60 * 24;
-        Long thisDayMillis = (currentTime / oneDayMillis) * oneDayMillis;
-        Long currentDayMillis = currentTime % oneDayMillis;
-        Long alarmDayMillis = preferences.getTime(alarmToInvoke) * 60 * 1000L;
-
-        // if morning, subtract song length
-        if (preferences.getPrefix().equals(Enums.MORNIN_PREFIX)) {
-            alarmDayMillis -= songManager.getSongDuration();
-        }
-
-        // to be sure, that RESET doesn't start a bit before alarm,
-        // cancels alarm, and then schedule next day alarm
-        // (executed alarm blocks this thread for at least 1000ms
-        // so it wont reexecute it)
-        if (alarmDayMillis < currentDayMillis + 1000) {
-            alarmDayMillis += oneDayMillis;
-        }
-
-        Long absoluteAlarmTimeMillis = thisDayMillis + alarmDayMillis
-                - new GregorianCalendar().getTimeZone().getRawOffset()
-                - 1000L * 60 * 60; // one hour millis to get to UTC;
-
-        Long timeToAlarmMillis = absoluteAlarmTimeMillis - System.currentTimeMillis();
-        int seconds = (int) (timeToAlarmMillis / 1000) % 60;
-        int minutes = (int) ((timeToAlarmMillis / (1000 * 60)) % 60);
-        int hours = (int) ((timeToAlarmMillis / (1000 * 60 * 60)) % 24);
-        int days = (int) ((timeToAlarmMillis / (1000 * 60 * 60 * 24)));
-        Log.i("AlarmService", String.format("Alarm in %d days, %d hours, %d minutes and %d seconds", days, hours, minutes, seconds));
-
-        return absoluteAlarmTimeMillis;
     }
 
     private void downloadSong() {
@@ -173,4 +125,5 @@ public class AlarmService extends IntentService {
         alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3 * 60 * 60 * 1000, pendingIntent);
         // "set" is used, no need to be exact
     }
+
 }
