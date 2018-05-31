@@ -13,6 +13,7 @@
         android:gravity="end"
         android:orientation="vertical">
 
+        <!-- Nepouzivej left, right, ale start,end; arabove pisou jinym smerem a maji jine usporadani aplikaci -->
         <TextView
             android:id="@+id/alarm_title"
             android:layout_width="wrap_content"
